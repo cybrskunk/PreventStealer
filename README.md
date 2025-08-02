@@ -4,7 +4,10 @@ Works by blocking any fetch & xhr outside of native to website API.
 Huge credits to [Zpayer](https://github.com/RandomUser15456) for providing the list of native-to-kogama APIs.
 
 
-Made with javascript and meant to use with an executor like [tampermonkey](https://www.tampermonkey.net/)
+Made with javascript and meant to use with an executor like [tampermonkey](https://www.tampermonkey.net/)  
+To install quicker feel welcome to [click right here](https://github.com/cybrskunk/PreventStealer/raw/refs/heads/main/src/preventstlr.user.js)
+
+
 
 [View Script Video Preview](https://youtu.be/WG7jrak2eKs)
 
