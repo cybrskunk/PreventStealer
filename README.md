@@ -3,7 +3,13 @@ A tampermonkey addon for WWW kogama that aims to prevent any sort of JS-based st
 Works by blocking any fetch & xhr outside of native to website API.   
 Huge credits to [Zpayer](https://github.com/RandomUser15456) for providing the list of native-to-kogama APIs.
 
+### NOTE: THIS SCRIPT IS NOT PERFECT.
+There **EXIST** a ton of ways this could be bypassed. Do NOT take your safety for granted.   
+**NEVER** test any suspicious scripts on your main account or within an environment where your sensitive data might be exposed.  
+**TAKE ALL THE PRECAUTIONS POSSIBLE.**
 
+
+## About
 Made with javascript and meant to use with an executor like [tampermonkey](https://www.tampermonkey.net/)  
 To install quicker feel welcome to [click right here](https://github.com/cybrskunk/PreventStealer/raw/refs/heads/main/src/PreventStealerV2.user.js)
 
