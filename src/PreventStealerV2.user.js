@@ -7,6 +7,7 @@
 // @match        https://www.kogama.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=kogama.com
 // @grant        none
+// @run-at       document-start
 // ==/UserScript==
 
 // Now also blocks requests trying to access password-endpoints
