@@ -8,7 +8,7 @@ Made with javascript and meant to use with an executor like [tampermonkey](https
 To install quicker feel welcome to [click right here](https://github.com/cybrskunk/PreventStealer/raw/refs/heads/main/src/PreventStealerV2.user.js)
 
 ### What does it even do?
-The scrit as of currently:  
+As of 4th August 2025, the script:  
 - Maps all of the native to the website API,
 - Blocks any requests that do not match our allowed list,
 - Prevents any requests that target password-related endpoints.
