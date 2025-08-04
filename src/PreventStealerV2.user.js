@@ -1,18 +1,18 @@
 // ==UserScript==
 // @name         PreventStealerV2
 // @namespace    http://tampermonkey.net/
-// @version      1.3
-// @description  An addon meant to help with determining whether a script is malicious, with intention to keep you safe.
-// @author       Simon, Zpayer.
+// @version      1.7
+// @description  Enhanced security addon to detect and block malicious password reset attempts
+// @author       Simon, Zpayer
 // @match        https://www.kogama.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=kogama.com
 // @grant        none
 // ==/UserScript==
 
+// Now also blocks requests trying to access password-endpoints
 (function() {
     'use strict';
- // would fetch from an online list but literally the counter-point of the inteded use, lol.
-    const ALLOWED_PATTERNS = [
+   const ALLOWED_PATTERNS = [
         /^\/api\/product\/subscription\/?$/,
         /^\/api\/product\/subscription\/promote-free\/?$/,
         /^\/api\/product\/gold\/?$/,
@@ -113,33 +113,74 @@
         /^\/marketplace\/?$/,
         /^\/locator\/session\/\?objectID=\d+&profileID=\d+&lang=\w+_\w+&type=\w+&referrer=\w+$/
     ];
+
+    const PASSWORD_PROTECTION = {
+        PROTECTED_ENDPOINTS: [
+            /\/password-reset\/?$/,
+            /\/password-reset-required\/?$/,
+            /\/password\/?$/
+        ],
+        BLOCKED_METHODS: ['PUT', 'POST'],
+        SUSPICIOUS_HEADERS: ['authorization', 'x-csrf-token', 'x-requested-with']
+    };
+
     function isAllowed(url) {
         if (!url.startsWith('http')) return true;
         const path = new URL(url).pathname + new URL(url).search;
         return ALLOWED_PATTERNS.some(pattern => pattern.test(path));
     }
 
-    // notification - this can be disabled but I'm keeping it for clarity. Perhaps you're not as experienced.
-    function logBlockedRequest(type, url) {
-        console.warn(`[Security] Blocked ${type} to:`, url);
-        const notification = document.createElement('div');
-        notification.style.position = 'fixed';
-        notification.style.bottom = '10px';
-        notification.style.right = '10px';
-        notification.style.backgroundColor = '#ff4444';
-        notification.style.color = 'white';
-        notification.style.padding = '10px';
-        notification.style.borderRadius = '5px';
-        notification.style.zIndex = '9999';
-        notification.style.maxWidth = '300px';
-        notification.innerHTML = `
-            <strong>Blocked ${type} request</strong><br>
-            ${url}<br>
-            <small>Check console for more details</small>
-        `;
-        document.body.appendChild(notification);
-        setTimeout(() => notification.remove(), 5000);
+    function isPasswordEndpoint(url) {
+        return PASSWORD_PROTECTION.PROTECTED_ENDPOINTS.some(pattern => pattern.test(url));
     }
+
+    function isSuspiciousPasswordRequest(init) {
+        if (!init) return false;
+        if (PASSWORD_PROTECTION.BLOCKED_METHODS.includes(init.method?.toUpperCase())) {
+            return true;
+        }
+        if (init.headers) {
+            const headers = init.headers instanceof Headers ?
+                Object.fromEntries(init.headers.entries()) :
+                init.headers;
+
+            return PASSWORD_PROTECTION.SUSPICIOUS_HEADERS.some(
+                header => headers[header] && (headers[header].includes('Bearer') || headers[header].includes('Token'))
+            );
+        }
+
+        return false;
+    }
+
+function logBlockedRequest(type, url, details = null) {
+    console.warn(`[Security] Blocked ${type} to:`, url, details);
+
+    const notification = document.createElement('div');
+    Object.assign(notification.style, {
+        position: 'fixed',
+        bottom: '10px',
+        right: '10px',
+        backgroundColor: '#2d2d2d',
+        color: '#e0e0e0',
+        padding: '8px 12px',
+        borderRadius: '4px',
+        borderLeft: '3px solid #ff4444',
+        fontSize: '13px',
+        zIndex: '9999',
+        maxWidth: '280px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+    });
+
+    notification.innerHTML = `
+        <div style="font-weight:500;margin-bottom:4px;">Blocked ${type}</div>
+        <div style="color:#aaa;font-size:12px;word-break:break-word;">${url}</div>
+        ${details ? `<div style="margin-top:4px;color:#888;font-size:11px;">${details}</div>` : ''}
+    `;
+
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 5000);
+}
+
     const originalFetch = window.fetch;
     window.fetch = function(resource, init) {
         const url = typeof resource === 'string' ? resource : resource.url;
@@ -147,8 +188,21 @@
             logBlockedRequest('fetch', url);
             return Promise.reject(new Error(`Request to ${url} blocked by security policy`));
         }
+        if (isPasswordEndpoint(url)) {
+            if (isSuspiciousPasswordRequest(init)) {
+                logBlockedRequest('fetch', url, 'Suspicious password change attempt blocked');
+                return Promise.reject(new Error('Suspicious password change attempt blocked'));
+            }
+        }
+
+        if (url.includes('discord.com/api/webhooks')) {
+            logBlockedRequest('fetch', url, 'Webhook requests are blocked');
+            return Promise.reject(new Error('Webhook requests are blocked'));
+        }
+
         return originalFetch.apply(this, arguments);
     };
+
     const originalOpen = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function(method, url) {
         if (!isAllowed(url)) {
@@ -157,6 +211,7 @@
         }
         return originalOpen.apply(this, arguments);
     };
+
     const originalWebSocket = window.WebSocket;
     window.WebSocket = function(url, protocols) {
         if (!isAllowed(url)) {
@@ -166,5 +221,5 @@
         return new originalWebSocket(url, protocols);
     };
 
-    console.log('%cPreventStlrV2 loaded', 'color: #4CAF50; font-weight: bold;');
+    console.log('%c[ PREVENTSTEALERV2 ] Monitoring for any suspicious traffic. . . ', 'color: #856F81; font-weight: bold;');
 })();
