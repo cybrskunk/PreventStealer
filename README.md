@@ -5,9 +5,13 @@ Huge credits to [Zpayer](https://github.com/RandomUser15456) for providing the l
 
 
 Made with javascript and meant to use with an executor like [tampermonkey](https://www.tampermonkey.net/)  
-To install quicker feel welcome to [click right here](https://github.com/cybrskunk/PreventStealer/raw/refs/heads/main/src/preventstlr.user.js)
+To install quicker feel welcome to [click right here](https://github.com/cybrskunk/PreventStealer/raw/refs/heads/main/src/PreventStealerV2.user.js)
 
-
+### What does it even do?
+The scrit as of currently:  
+- Maps all of the native to the website API,
+- Blocks any requests that do not match our allowed list,
+- Prevents any requests that target password-related endpoints.
 
 [View Script Video Preview](https://youtu.be/WG7jrak2eKs)
 
