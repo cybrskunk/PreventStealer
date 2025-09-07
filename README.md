@@ -19,6 +19,11 @@ As of 4th August 2025, the script:
 - Blocks any requests that do not match our allowed list,
 - Prevents any requests that target password-related endpoints.
 
+September 7th Update:    
+Now also displays {partially} payload.    
+> <img width="373" height="214" alt="{6158E2D3-D7BB-4332-9ECE-19A043701671}" src="https://github.com/user-attachments/assets/e411501a-74a9-4b1d-b545-5d086c0fb903" />
+
+
 [View Script Video Preview](https://youtu.be/WG7jrak2eKs)
 
 
